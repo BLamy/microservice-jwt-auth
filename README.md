@@ -6,11 +6,11 @@ A 'just add keys' JWT authentication endpoint.
 - passport
 - jwt
 - docker
-- rethinkdb
+- redis
 
 ## Roadmap
 - [ ] Setup a basic koa application
-- [ ] Connect to a rethinkDB docker instance.
+- [ ] Connect to a redis docker instance.
 - [ ] Add passport-local to koa application. 
 - [ ] Add JWT support to passport-local
 - [ ] Containerize application
