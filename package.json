@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
+    "debug": "devtool server.js --watch",
     "test": "mocha"
   },
   "repository": {
@@ -32,6 +33,7 @@
     "sqlite3": "^3.1.1"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "mocha": "^2.4.5",
     "supertest": "^1.2.0"
   }

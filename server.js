@@ -39,19 +39,7 @@ Promise.coroutine(function*() {
   yield db.schema.createTableIfNotExists('user', function(table) {
     table.increments();
     table.string('name');
-    table.timestamps();
-  });
-
-  yield db.schema.createTableIfNotExists('machine', function(table) {
-    table.increments();
-    table.string('name');
-    table.string('ip');
-    table.timestamps();
-  });
-
-  yield db.schema.createTableIfNotExists('company', function(table) {
-    table.increments();
-    table.string('name');
+    table.string('password');
     table.timestamps();
   });
 
@@ -103,6 +91,10 @@ router.post('/login', passport.authenticate('local', {
   let options = { algorithm: 'RS256' };
   this.type = 'base64';
   this.body = jwt.sign(claims, privateKey, options);
+});
+
+router.post('register', function*() {
+
 });
 
 router.get('/app', function*() {

@@ -1,5 +1,6 @@
 'use strict'
 const http = require('http');
+const expect = require('chai').expect;
 const assert = require('assert');
 const request = require('supertest')
 const app = require('../server.js');
@@ -22,7 +23,9 @@ describe('Example Node Server', () => {
       .send({ username: 'test', password: 'test' })
       .expect(302)
       .end(function(err, res) {
-        console.dir(res)
+        let encodedHeader = new Buffer(res.text.split('.')[0], 'base64');
+        let header = JSON.parse(encodedHeader.toString());
+        expect(header.typ).to.equal('JWT');
         done();
       });
   });
