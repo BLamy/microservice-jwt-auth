@@ -10,9 +10,9 @@ A 'just add keys' JWT authentication endpoint.
 
 ## Roadmap
 - [x] Setup a basic koa application
-- [ ] Setup knex users 
-- [ ] Add passport-local to koa application.
-- [ ] Add JWT support to passport-local
+- [x] Setup knex users 
+- [x] Add passport-local to koa application.
+- [x] Add JWT support to passport-local
 - [ ] Containerize application
 - [ ] Link keys write docs
 - [ ] Ship to docker hub
