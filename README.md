@@ -20,6 +20,8 @@ A 'just add keys' JWT authentication endpoint.
 - [ ] Can Modify User through GUI
 - [ ] Can Delete User through GUI
 - [ ] Convert rest API to GraphQL endpoint
+- [ ] Open source
+- [ ] Add CI 
 - [ ] Containerize application
 - [ ] Link keys write docs
 - [ ] Ship to docker hub
