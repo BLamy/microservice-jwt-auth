@@ -1,18 +1,39 @@
 'use strict';
+// Environment variables
+const port = process.env.PORT || 3000;
+const dbPath = process.env.SQLITE_PATH || './passport.sqlite';
+const privateKeyPath = process.env.PRIVATE_KEY_PATH || 'keys/demo.rsa';
+const publicKeyPath = process.env.PUBLIC_KEY_PATH || 'keys/demo.rsa.pub';
+const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
 
+// Dependencies
 const app = require('koa')();
 const knex = require('knex');
 const fs = require('fs-promise');
-const jwt = require('koa-jwt');
 const co = require('co');
 const bcrypt = require('co-bcryptjs');
 const router = require('koa-router')();
 const passport = require('koa-passport');
 const LocalStrategy = require('passport-local').Strategy;
-const koaBody = require('koa-body');
+const serve = require('koa-static');
+const mount = require('koa-mount');
+const jwt = require('koa-jwt');
+const koaBody = require('koa-body')({
+  multipart: true
+});
+const authenticate = passport.authenticate('local', {
+  session: false
+});
+const jwtVerifyOpts = {
+  secret: fs.readFileSync(publicKeyPath),
+  algorithm: 'RS256'
+};
 
-const port = process.env.PORT || 3000;
-const DBNAME = './passport.sqlite';
+var decodeJWTBody = (jwt) => {
+  let encodedClaims = new Buffer(jwt.split('.')[1], 'base64');
+  return JSON.parse(encodedClaims.toString());
+};
 
 //----------------------
 //  Add database connection to `this.knex`
@@ -20,16 +41,33 @@ co(function* addKnexToContext() {
   let db = knex({
     client: 'sqlite3',
     connection: {
-      filename: process.env.DBNAME || DBNAME
+      filename: dbPath
     }
   });
   try {
     yield db.schema.createTable('user', function(table) {
       table.increments();
-      table.string('name').unique();
+      table.string('username').unique();
       table.string('password');
+      table.boolean('is_admin');
       table.timestamps();
     });
+
+    // Create Admin user
+    let username = adminUsername;
+    let salt = yield bcrypt.genSalt(10);
+    let password = yield bcrypt.hash(adminPassword, salt);
+    let created_at = new Date();
+    let updated_at = created_at;
+    let is_admin = true;
+    yield db('user').returning('*').insert({
+      username,
+      password,
+      created_at,
+      updated_at,
+      is_admin
+    });
+
   } catch (ex) {} finally {
     app.context.knex = db;
   }
@@ -38,23 +76,24 @@ co(function* addKnexToContext() {
 //----------------------
 //  Setup a local passport strategy
 (function addPassportLocalStrategy() {
-  var user = {
-    id: 1,
-    username: 'test'
-  };
 
   passport.serializeUser(function(user, done) {
     done(null, user.id)
   });
 
   passport.deserializeUser(function(id, done) {
-    done(null, user)
+    co(function*() {
+      let results = yield this.knex('user').where({
+        id
+      });
+      done(null, results[0])
+    });
   });
 
   passport.use(new LocalStrategy(function(username, password, done) {
     co(function*() {
       let results = yield this.knex('user').where({
-        name: username
+        username
       });
       let user = results[0];
 
@@ -70,42 +109,46 @@ co(function* addKnexToContext() {
   app.use(passport.session());
 })();
 
+app.use(mount('/bower_components', serve(__dirname + '/bower_components')));
+
 router.get('/', function*() {
   this.type = 'html';
   this.body = fs.createReadStream('views/login.html');
 });
 
-router.post('/login', koaBody({
-  multipart: true
-}), passport.authenticate('local', {
-  session: false
-}), function*() {
-  let claims = {
-    'username': "foo"
-  };
+router.post('/login', koaBody, authenticate, function*() {
+  let claims = this.passport.user;
+  delete claims.password;
+
   let options = {
     algorithm: 'RS256'
   };
-  let privateKey = yield fs.readFile('demo.rsa');
+  let privateKey = yield fs.readFile(privateKeyPath);
   this.type = 'base64';
   this.body = jwt.sign(claims, privateKey, options);
 });
 
-router.post('/register', koaBody({
-  multipart: true
-}), function*(next) {
-  var name = this.request.body.username;
-  var salt = yield bcrypt.genSalt(10);
-  var password = yield bcrypt.hash(this.request.body.password, salt);
-  var created_at = new Date();
-  var updated_at = created_at;
+router.post('/register', jwt(jwtVerifyOpts), koaBody, function*(next) {
+  var claims = decodeJWTBody(this.headers.authorization);
+  if (!claims.is_admin) {
+    this.status = 403;
+    return;
+  }
 
-  if (name && password) {
+  let username = this.request.body.username;
+  let salt = yield bcrypt.genSalt(10);
+  let password = yield bcrypt.hash(this.request.body.password, salt);
+  let created_at = new Date();
+  let updated_at = created_at;
+  let is_admin = false;
+
+  if (username && password) {
     this.body = yield this.knex('user').returning('*').insert({
-      name,
+      username,
       password,
       created_at,
-      updated_at
+      updated_at,
+      is_admin
     });
     this.status = 200;
     return;
@@ -113,14 +156,10 @@ router.post('/register', koaBody({
   this.status = 400;
 });
 
-router.get('/app', jwt({
-    secret: fs.readFileSync('demo.rsa.pub'),
-    algorithm: 'RS256'
-  }),
-  function*() {
-    this.type = 'html';
-    this.body = fs.createReadStream('views/app.html');
-  });
+router.get('/app', jwt(jwtVerifyOpts), function*() {
+  this.type = 'html';
+  this.body = fs.createReadStream('views/app.html');
+});
 
 app.use(router.routes()).use(router.allowedMethods());
 

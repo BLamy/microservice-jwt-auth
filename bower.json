@@ -1,0 +1,21 @@
+{
+  "name": "microservice-jwt-auth",
+  "description": "A 'just add keys' JWT authentication endpoint.",
+  "main": "index.js",
+  "authors": [
+    "Brett Lamy <bel423@me.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/BLamy/microservice-jwt-auth",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-toolbar": "PolymerElements/paper-toolbar#~1.1.4"
+  }
+}

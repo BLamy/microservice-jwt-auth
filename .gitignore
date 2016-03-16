@@ -35,3 +35,4 @@ demo.rsa
 demo.rsa.pub
 .sqlite
 passport.sqlite
+bower_components
