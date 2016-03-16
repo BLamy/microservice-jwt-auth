@@ -128,7 +128,17 @@ router.post('/login', koaBody, authenticate, function*() {
   this.body = jwt.sign(claims, privateKey, options);
 });
 
-router.post('/register', jwt(jwtVerifyOpts), koaBody, function*(next) {
+router.get('/app', jwt(jwtVerifyOpts), function*() {
+  this.type = 'html';
+  this.body = fs.createReadStream('views/app.html');
+});
+
+router.get('/users', jwt(jwtVerifyOpts), function*() {
+  this.type = 'html';
+  this.body = yield this.knex('user');
+});
+
+router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
   var claims = decodeJWTBody(this.headers.authorization);
   if (!claims.is_admin) {
     this.status = 403;
@@ -150,16 +160,26 @@ router.post('/register', jwt(jwtVerifyOpts), koaBody, function*(next) {
       updated_at,
       is_admin
     });
-    this.status = 200;
+    this.status = 201;
     return;
   }
   this.status = 400;
 });
 
-router.get('/app', jwt(jwtVerifyOpts), function*() {
-  this.type = 'html';
-  this.body = fs.createReadStream('views/app.html');
+router.delete('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
+  var claims = decodeJWTBody(this.headers.authorization);
+  if (!claims.is_admin) {
+    this.status = 403;
+    return;
+  }
+
+  let username = this.request.body.username;
+  this.knex('user')
+    .where({username})
+    .del();
+  this.status = 200;
 });
+
 
 app.use(router.routes()).use(router.allowedMethods());
 

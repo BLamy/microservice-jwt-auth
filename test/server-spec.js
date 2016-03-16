@@ -35,7 +35,7 @@ describe('Microservice jwt auth', () => {
   });
 
   before(done => {
-    http.post('/register')
+    http.post('/users')
       .set('Authorization', `Bearer ${adminJwt}`)
       .send({ username: 'test', password: 'test' })
       .end(function(err, res) {
@@ -57,28 +57,6 @@ describe('Microservice jwt auth', () => {
       http.post('/login')
         .send({ username: 'admin', password: 'admin' })
         .expect(200, done);
-    });
-  });
-
-  describe('Register', function () {
-    it('User registation should not work without JWT', done => {
-      http.post('/register')
-        .send({ username: 'register', password: 'register' })
-        .expect(401, done)
-    });
-
-    it('User registation should not work if user is not admin', done => {
-      http.post('/register')
-        .set('Authorization', `Bearer ${userJwt}`)
-        .send({ username: 'register', password: 'register' })
-        .expect(403, done)
-    });
-
-    it('Admin should be able to create new user account', done => {
-      http.post('/register')
-        .set('Authorization', `Bearer ${adminJwt}`)
-        .send({ username: 'register', password: 'register' })
-        .expect(200, done)
     });
   });
 
@@ -121,5 +99,62 @@ describe('Microservice jwt auth', () => {
       http.get('/bower_components/polymer/polymer.html').expect(200, done);
     });
   });
+
+  describe('GET /users', () => {
+    it('Should 401 without jwt', done => {
+      http.get('/users').expect(401, done);
+    });
+
+    it('Should allow access with jwt', done => {
+      http.get('/users')
+        .set('Authorization', `Bearer ${userJwt}`)
+        .expect(200, done);
+    });
+  });
+
+  describe('POST /users', () => {
+    it('User registation should not work without JWT', done => {
+      http.post('/users')
+        .send({ username: 'register', password: 'register' })
+        .expect(401, done)
+    });
+
+    it('User registation should not work if user is not admin', done => {
+      http.post('/users')
+        .set('Authorization', `Bearer ${userJwt}`)
+        .send({ username: 'register', password: 'register' })
+        .expect(403, done)
+    });
+
+    it('Admin should be able to create new user account', done => {
+      http.post('/users')
+        .set('Authorization', `Bearer ${adminJwt}`)
+        .send({ username: 'register', password: 'register' })
+        .expect(201, done)
+    });
+  });
+
+  describe('DELETE /users', () => {
+    it('Should 401 without jwt', done => {
+      http.delete('/users')
+        .send({ username: 'test' })
+        .expect(401, done)
+    });
+
+    it('Should 403 with non-admin jwt', done => {
+      http.delete('/users')
+        .set('Authorization', `Bearer ${userJwt}`)
+        .send({ username: 'test' })
+        .expect(403, done)
+    });
+
+    it('Should allow access with admin jwt jwt', done => {
+      http.delete('/users')
+        .set('Authorization', `Bearer ${adminJwt}`)
+        .send({ username: 'test' })
+        .expect(200, done)
+    });
+  });
+
 
 });
