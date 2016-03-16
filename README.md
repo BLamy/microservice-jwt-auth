@@ -13,6 +13,13 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Setup knex users 
 - [x] Add passport-local to koa application.
 - [x] Add JWT support to passport-local
+- [ ] Create Restful API for users
+- [ ] Can login to app through GUI
+- [ ] Can view all users
+- [ ] Can Add user through GUI
+- [ ] Can Modify User through GUI
+- [ ] Can Delete Uswer through GUI
+- [ ] Convert rest API to GraphQL endpoint
 - [ ] Containerize application
 - [ ] Link keys write docs
 - [ ] Ship to docker hub
