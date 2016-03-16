@@ -18,8 +18,9 @@ A 'just add keys' JWT authentication endpoint.
 - [ ] Can view all users
 - [ ] Can Add user through GUI
 - [ ] Can Modify User through GUI
-- [ ] Can Delete Uswer through GUI
+- [ ] Can Delete User through GUI
 - [ ] Convert rest API to GraphQL endpoint
 - [ ] Containerize application
 - [ ] Link keys write docs
 - [ ] Ship to docker hub
+- [ ] Docker compose connect to MYSQL
