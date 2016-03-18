@@ -19,6 +19,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const serve = require('koa-static');
 const mount = require('koa-mount');
 const jwt = require('koa-jwt');
+
 const koaBody = require('koa-body')({
   multipart: true
 });
@@ -49,6 +50,7 @@ co(function* addKnexToContext() {
       table.increments();
       table.string('username').unique();
       table.string('password');
+      // table.date('last_token_iat')
       table.boolean('is_admin');
       table.timestamps();
     });
@@ -110,10 +112,11 @@ co(function* addKnexToContext() {
 })();
 
 app.use(mount('/bower_components', serve(__dirname + '/bower_components')));
+app.use(mount('/views', serve(__dirname + '/views')));
 
 router.get('/', function*() {
   this.type = 'html';
-  this.body = fs.createReadStream('views/login.html');
+  this.body = fs.createReadStream('views/index.html');
 });
 
 router.post('/login', koaBody, authenticate, function*() {
@@ -140,6 +143,7 @@ router.get('/users', jwt(jwtVerifyOpts), function*() {
 
 router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
   var claims = decodeJWTBody(this.headers.authorization);
+  // TODO Lookup user to verify they are still an admin and that the token isn't stale.
   if (!claims.is_admin) {
     this.status = 403;
     return;

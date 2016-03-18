@@ -81,7 +81,6 @@ describe('Microservice jwt auth', () => {
   });
 
   describe('Test JWT Authentication on /app', () => {
-
     it('Should not allow access without JWT', done => {
       http.get('/app')
         .expect(401, done);

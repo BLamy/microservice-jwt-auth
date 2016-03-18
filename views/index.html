@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Authentication</title>
+  <meta name="description" content="">
+
+  <!-- Mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Chrome / Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="black">
+  <link rel="icon" href="icon.png">
+
+  <!-- Safari / iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
+
+  <!-- Web Components -->
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+  <link rel="import" href="bower_components/paper-card/paper-card.html">
+  <link rel="import" href="bower_components/paper-input/paper-input.html">
+  <link rel="import" href="bower_components/paper-button/paper-button.html">
+  <link rel="import" href="bower_components/paper-styles/paper-styles.html">
+  <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+  <link rel="import" href="views/control-panel.html">
+  <style is="custom-style">
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--paper-grey-50);
+      @apply(--paper-font-common-base);
+    }
+
+    #login-box {
+      left: 50%;
+      display: block;
+      overflow: auto;
+      background-color: white;
+      position: absolute;
+      top: 35%;
+      transform: translateY(-50%) translateX(-50%);
+      max-width: 500px;
+      border-radius: 2px;
+      width: 100%;
+      --paper-card-header-color: white;
+      --paper-card-header: {
+        background-color: var(--paper-green-500);
+      }
+      ;
+    }
+
+    #login-box paper-button {
+      float: right;
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body unresolved>
+  <template is='dom-bind'>
+    <iron-ajax id="request" method="post" content-type="application/json" url="/login" handle-as="text" last-response="{{jwt}}"></iron-ajax>
+    <paper-card id='login-box' hidden="[[isLoggedIn(jwt)]]" heading="Login">
+      <div class="card-content">
+        <paper-input id="username" name="username" label="Username"></paper-input>
+        <paper-input id="password" name="password" label="Password"></paper-input>
+      </div>
+      <div class="card-actions">
+        <paper-button on-tap="attemptLogin">Login</paper-button>
+      </div>
+    </paper-card>
+
+    <div hidden="[[!isLoggedIn(jwt)]]">
+      <control-panel jwt="[[jwt]]"></control-panel>
+    </div>
+  </template>
+
+  <script type="text/javascript">
+    (function(scope) {
+      scope.jwt = '';
+
+      scope.isLoggedIn = function(jwt) {
+        return (jwt !== '');
+      }
+
+      scope.attemptLogin = function() {
+        var username = this.$.username.value;
+        var password = this.$.password.value;
+        var request = this.$.request;
+        request.body = {
+          username: username,
+          password: password
+        };
+        request.generateRequest();
+      };
+
+
+    })(document.querySelector("template[is='dom-bind']"));
+  </script>
+</body>
+
+</html>
