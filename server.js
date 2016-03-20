@@ -111,12 +111,12 @@ co(function* addKnexToContext() {
   app.use(passport.session());
 })();
 
-app.use(mount('/bower_components', serve(__dirname + '/bower_components')));
-app.use(mount('/views', serve(__dirname + '/views')));
+app.use(mount('/bower_components', serve(__dirname + '/frontend/bower_components')));
+app.use(serve('frontend/app'));
 
 router.get('/', function*() {
   this.type = 'html';
-  this.body = fs.createReadStream('views/index.html');
+  this.body = fs.createReadStream('frontend/app/index.html');
 });
 
 router.post('/login', koaBody, authenticate, function*() {
@@ -133,7 +133,7 @@ router.post('/login', koaBody, authenticate, function*() {
 
 router.get('/app', jwt(jwtVerifyOpts), function*() {
   this.type = 'html';
-  this.body = fs.createReadStream('views/app.html');
+  this.body = fs.createReadStream('frontend/app/index.html');
 });
 
 router.get('/users', jwt(jwtVerifyOpts), function*() {
