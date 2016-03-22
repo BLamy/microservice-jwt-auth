@@ -17,8 +17,15 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Can login to app through GUI
 - [x] Can view all users
 - [x] Can Add user through GUI
+- [x] Developer panel shows jwt.
+- [ ] developer panel shows decoded claims.
+- [ ] admin can edit claims.
 - [ ] Can Modify User through GUI
 - [ ] Can Delete User through GUI
+- [ ] View own user profile
+- [ ] Edit own user profile
+- [ ] logout (clear localstorage)
+- [ ] Token Blacklist
 - [ ] Convert rest API to GraphQL endpoint
 - [ ] GraphiQL console for admin users
 - [ ] Open source

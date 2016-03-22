@@ -95,9 +95,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <span>Users</span>
           </a>
 
-          <a data-route="contact" href="{{baseUrl}}contact">
+          <a data-route="contact" href="{{baseUrl}}developer">
             <iron-icon icon="mail"></iron-icon>
-            <span>Contact</span>
+            <span>Developer</span>
           </a>
         </paper-menu>
       </paper-scroll-header-panel>
@@ -138,8 +138,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
 
             <section data-route="users">
-              <iron-ajax id='getUsers' url="/users" handle-as="json" last-response="{{users}}"></iron-ajax>
-              <iron-ajax id='createUser' method="post" content-type="application/json" url="/users" handle-as="json" on-response="userCreated"></iron-ajax>
+              <iron-ajax id='getUsers' auto headers="[[calcHeaders(jwt)]]" url="/users" handle-as="json" last-response="{{users}}"></iron-ajax>
+              <iron-ajax id='createUser' headers="[[calcHeaders(jwt)]]" method="post" content-type="application/json" url="/users" handle-as="json" on-response="userCreated"></iron-ajax>
               <template is="dom-if" if="[[user.is_admin]]" restamp="true">
                 <paper-fab on-tap="openCreateUser" icon="add"></paper-fab>
               </template>
@@ -165,15 +165,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <section data-route="user-info">
               <paper-material elevation="1">
+                <li><a href$="[[baseUrl]]users/[[user.username]]/">[[user.username]]</a></li>
                 <h2 class="page-title">User: {{params.name}}</h2>
                 <div>This is {{params.name}}'s section</div>
               </paper-material>
             </section>
 
-            <section data-route="contact">
+            <section data-route="developer">
+              <style>
+                .jwt {
+                  word-wrap: break-word;
+                }
+              </style>
               <paper-material elevation="1">
-                <h2 class="page-title">Contact</h2>
-                <p>This is the contact section</p>
+
+                <h2>Your Token:</h2>
+                <div class="jwt">
+                  [[jwt]]
+                </div>
               </paper-material>
             </section>
 
