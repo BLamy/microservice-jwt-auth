@@ -1,4 +1,5 @@
 'use strict';
+
 // Environment variables
 const port = process.env.PORT || 3000;
 const dbPath = process.env.SQLITE_PATH || './passport.sqlite';
@@ -142,7 +143,7 @@ router.get('/users', jwt(jwtVerifyOpts), function*() {
 });
 
 router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
-  var claims = decodeJWTBody(this.headers.authorization);
+  let claims = decodeJWTBody(this.headers.authorization);
   // TODO Lookup user to verify they are still an admin and that the token isn't stale.
   if (!claims.is_admin) {
     this.status = 403;
@@ -157,13 +158,15 @@ router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
   let is_admin = false;
 
   if (username && password) {
-    this.body = yield this.knex('user').returning('*').insert({
+    var user = {
       username,
       password,
       created_at,
       updated_at,
       is_admin
-    });
+    };
+    user.id = (yield this.knex('user').returning('id').insert(user)).pop();
+    this.body = user;
     this.status = 201;
     return;
   }
@@ -171,7 +174,7 @@ router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
 });
 
 router.delete('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
-  var claims = decodeJWTBody(this.headers.authorization);
+  let claims = decodeJWTBody(this.headers.authorization);
   if (!claims.is_admin) {
     this.status = 403;
     return;

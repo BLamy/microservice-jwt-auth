@@ -15,8 +15,8 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Add JWT support to passport-local
 - [x] Create Restful API for users
 - [x] Can login to app through GUI
-- [ ] Can view all users
-- [ ] Can Add user through GUI
+- [x] Can view all users
+- [x] Can Add user through GUI
 - [ ] Can Modify User through GUI
 - [ ] Can Delete User through GUI
 - [ ] Convert rest API to GraphQL endpoint
@@ -27,3 +27,6 @@ A 'just add keys' JWT authentication endpoint.
 - [ ] Link keys write docs
 - [ ] Ship to docker hub
 - [ ] Docker compose connect to MYSQL
+- [ ] Rethink DB
+- [ ] Realtime socket communication [Socket Cluster](https://github.com/SocketCluster/socketcluster)
+- [ ]

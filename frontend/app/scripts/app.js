@@ -15,6 +15,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
   app.jwt = '';
+  app.user = false;
+  app.addUserOpen = false;
 
   app.isLoggedIn = function(jwt) {
     return (jwt !== '');
@@ -31,6 +33,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     request.generateRequest();
   };
 
+  app.attemptResponse = function(e) {
+    this.jwt = e.detail.response;
+    // Set this.user
+    let encodedClaims = atob(this.jwt.split('.')[1]);
+    let claims = JSON.parse(encodedClaims.toString());
+    this.user = claims;
+
+    // Get Users
+    this.$.getUsers.headers = {"Authorization": "Bearer " + this.jwt};
+    this.$.getUsers.generateRequest();
+
+    // Trigger reflow
+    window.dispatchEvent(new Event('resize'));
+  };
+
+  app.openCreateUser = function() {
+    this.addUserOpen = true;
+  };
+  app.closeCreateUser = function() {
+    this.addUserOpen = false;
+  };
+
+
+  app.capitalize = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  app.createUser = function() {
+    this.$.createUser.headers = {"Authorization": "Bearer " + this.jwt};
+    var username = this.$.createUsername.value;
+    var password = this.$.createPassword.value;
+    this.$.createUser.body = {
+      username: username,
+      password: password
+    };
+    this.$.createUser.generateRequest();
+  };
+
+  app.userCreated = function(e) {
+    this.push('users', e.detail.response);
+  };
 
 
   // Sets app default base URL
