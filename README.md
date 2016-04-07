@@ -20,6 +20,11 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Developer panel shows jwt.
 - [ ] developer panel shows decoded claims.
 - [ ] admin can edit claims.
+- [ ] Naive logout 
+- [ ] Users display in data table
+- [ ] establish socket connection to server
+- [ ] login via socket
+- [ ] Can see when user was last online in datatable
 - [ ] Can Modify User through GUI
 - [ ] Can Delete User through GUI
 - [ ] View own user profile
