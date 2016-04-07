@@ -18,7 +18,9 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Can view all users
 - [x] Can Add user through GUI
 - [x] Developer panel shows jwt.
-- [ ] developer panel shows decoded claims.
+- [x] developer panel shows decoded claims.
+- [ ] Separate each page into it's own element. 
+- [ ] Setup frontend test
 - [ ] admin can edit claims.
 - [ ] Naive logout 
 - [ ] Users display in data table
