@@ -31,6 +31,7 @@ const jwtVerifyOpts = {
   secret: fs.readFileSync(publicKeyPath),
   algorithm: 'RS256'
 };
+const jwtVerify = jwt.bind(jwt, jwtVerifyOpts);
 
 var decodeJWTBody = (jwt) => {
   let encodedClaims = new Buffer(jwt.split('.')[1], 'base64');

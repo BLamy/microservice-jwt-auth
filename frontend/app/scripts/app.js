@@ -9,21 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 (function(document) {
   'use strict';
-  var jwt_claims = function(jwt) {
-    var encodedClaims = atob(jwt.split('.')[1]);
-    return JSON.parse(encodedClaims.toString());
-  }
   // Grab a reference to our auto-binding template
   // and give it some initial binding values
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
-  app.jwt = localStorage.getItem('jwt');
-  if (app.jwt) {
-    app.user = jwt_claims(app.jwt);
-  } else {
-    app.user = false;
-  }
-  app.addUserOpen = false;
 
   app.isLoggedIn = function(jwt) {
     return (jwt !== '');
@@ -44,12 +33,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     this.$.getUsers.headers = {"Authorization": "Bearer " + jwt};
   }
 
+  app.decodeClaims = function (jwt) {
+    var encodedClaims = atob(jwt.split('.')[1]);
+    return encodedClaims.toString();
+  }
+
+  app.stringifyUser = function (user) {
+    return JSON.stringify(user, null, '\t').trim();
+  }
+
   app.attemptResponse = function(e) {
     this.jwt = e.detail.response;
     localStorage.setItem('jwt', this.jwt);
 
     // Set this.user
-    this.user = jwt_claims(this.jwt);
+    this.user = JSON.parse(this.decodeClaims(this.jwt));
 
     // Get Users
     this.$.getUsers.generateRequest();
@@ -84,6 +82,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   };
 
 
+
   // Sets app default base URL
   app.baseUrl = '/';
   if (window.location.port === '') { // if production
@@ -108,6 +107,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
     // imports are loaded and elements have been registered
+
+    app.jwt = localStorage.getItem('jwt');
+    if (app.jwt) {
+      app.user = JSON.parse(app.decodeClaims(app.jwt));
+    } else {
+      app.user = false;
+    }
+    app.addUserOpen = false;
+
   });
 
   // Main area's paper-scroll-header-panel custom condensing transformation of

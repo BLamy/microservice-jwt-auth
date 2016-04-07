@@ -147,7 +147,7 @@ describe('Microservice jwt auth', () => {
         .expect(403, done)
     });
 
-    it('Should allow access with admin jwt jwt', done => {
+    it('Should allow access with admin jwt', done => {
       http.delete('/users')
         .set('Authorization', `Bearer ${adminJwt}`)
         .send({ username: 'test' })
