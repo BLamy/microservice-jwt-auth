@@ -2,6 +2,8 @@
 A 'just add keys' JWT authentication endpoint.
 
 ## Technologies
+- Lessons learned from: https://github.com/xmlking/trust-broker
+- Typescript
 - Koa
 - passport
 - jwt
@@ -19,6 +21,8 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Can Add user through GUI
 - [x] Developer panel shows jwt.
 - [x] developer panel shows decoded claims.
+- [ ] Rewrite in typescript
+- [ ] Rewrite front end in angular 2
 - [ ] Separate each page into it's own element. 
 - [ ] Setup frontend test
 - [ ] admin can edit claims.
