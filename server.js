@@ -33,7 +33,7 @@ const jwtVerifyOpts = {
 };
 const jwtVerify = jwt.bind(jwt, jwtVerifyOpts);
 
-var decodeJWTBody = (jwt) => {
+const decodeJWTBody = (jwt) => {
   let encodedClaims = new Buffer(jwt.split('.')[1], 'base64');
   return JSON.parse(encodedClaims.toString());
 };
@@ -48,7 +48,7 @@ co(function* addKnexToContext() {
     }
   });
   try {
-    yield db.schema.createTable('user', function(table) {
+    yield db.schema.createTable('user', (table) => {
       table.increments();
       table.string('username').unique();
       table.string('password');
@@ -58,18 +58,13 @@ co(function* addKnexToContext() {
     });
 
     // Create Admin user
-    let username = adminUsername;
     let salt = yield bcrypt.genSalt(10);
-    let password = yield bcrypt.hash(adminPassword, salt);
-    let created_at = new Date();
-    let updated_at = created_at;
-    let is_admin = true;
     yield db('user').returning('*').insert({
-      username,
-      password,
-      created_at,
-      updated_at,
-      is_admin
+      username: adminUsername,
+      password: yield bcrypt.hash(adminPassword, salt),
+      created_at: new Date(),
+      updated_at: new Date(),
+      is_admin: true
     });
 
   } catch (ex) {} finally {
@@ -81,27 +76,22 @@ co(function* addKnexToContext() {
 //  Setup a local passport strategy
 (function addPassportLocalStrategy() {
 
-  passport.serializeUser(function(user, done) {
+  passport.serializeUser((user, done) => {
     done(null, user.id)
   });
 
-  passport.deserializeUser(function(id, done) {
+  passport.deserializeUser((id, done) => {
     co(function*() {
-      let results = yield this.knex('user').where({
-        id
-      });
-      done(null, results[0])
+      let [user] = yield this.knex('user').where({ id });
+      done(null, user)
     });
   });
 
   passport.use(new LocalStrategy(function(username, password, done) {
     co(function*() {
-      let results = yield this.knex('user').where({
-        username
-      });
-      let user = results[0];
-
-      if (user && (yield bcrypt.compare(password, user.password))) {
+      let [user] = yield this.knex('user').where({ username });
+      let passwordsMatch = yield bcrypt.compare(password, user.password);
+      if (user && passwordsMatch) {
         done(null, user)
       } else {
         done(null, false)
@@ -125,10 +115,9 @@ router.post('/login', koaBody, authenticate, function*() {
   let claims = this.passport.user;
   delete claims.password;
 
-  let options = {
-    algorithm: 'RS256'
-  };
-  let privateKey = yield fs.readFile(privateKeyPath);
+  let options = { algorithm: 'RS256' };
+  const privateKey = yield fs.readFile(privateKeyPath);
+
   this.type = 'base64';
   this.body = jwt.sign(claims, privateKey, options);
 });
@@ -144,29 +133,23 @@ router.get('/users', jwt(jwtVerifyOpts), function*() {
 });
 
 router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
-  let claims = decodeJWTBody(this.headers.authorization);
+  const claims = decodeJWTBody(this.headers.authorization);
   // TODO Lookup user to verify they are still an admin and that the token isn't stale.
   if (!claims.is_admin) {
     this.status = 403;
     return;
   }
 
-  let username = this.request.body.username;
-  let salt = yield bcrypt.genSalt(10);
-  let password = yield bcrypt.hash(this.request.body.password, salt);
-  let created_at = new Date();
-  let updated_at = created_at;
-  let is_admin = false;
+  const username = this.request.body.username;
+  const salt = yield bcrypt.genSalt(10);
+  const password = yield bcrypt.hash(this.request.body.password, salt);
+  const created_at = new Date();
+  const updated_at = created_at;
+  const is_admin = false;
 
   if (username && password) {
-    var user = {
-      username,
-      password,
-      created_at,
-      updated_at,
-      is_admin
-    };
-    user.id = (yield this.knex('user').returning('id').insert(user)).pop();
+    const user = { username, password, created_at, updated_at, is_admin };
+    [user.id] = yield this.knex('user').returning('id').insert(user);
     this.body = user;
     this.status = 201;
     return;
@@ -175,16 +158,14 @@ router.post('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
 });
 
 router.delete('/users', jwt(jwtVerifyOpts), koaBody, function*(next) {
-  let claims = decodeJWTBody(this.headers.authorization);
+  const claims = decodeJWTBody(this.headers.authorization);
   if (!claims.is_admin) {
     this.status = 403;
     return;
   }
 
-  let username = this.request.body.username;
-  this.knex('user')
-    .where({username})
-    .del();
+  const username = this.request.body.username;
+  this.knex('user').where({ username }).del();
   this.status = 200;
 });
 
