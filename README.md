@@ -22,11 +22,12 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Developer panel shows jwt.
 - [x] developer panel shows decoded claims.
 - [ ] Rewrite in typescript
+- [ ] Split server into modules
 - [ ] Rewrite front end in angular 2
-- [ ] Separate each page into it's own element. 
+- [ ] Separate each page into it's own element.
 - [ ] Setup frontend test
 - [ ] admin can edit claims.
-- [ ] Naive logout 
+- [ ] Naive logout
 - [ ] Users display in data table
 - [ ] establish socket connection to server
 - [ ] login via socket
