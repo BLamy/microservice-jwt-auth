@@ -21,6 +21,26 @@ A 'just add keys' JWT authentication endpoint.
 - [x] Can Add user through GUI
 - [x] Developer panel shows jwt.
 - [x] developer panel shows decoded claims.
+- [ ] Create companies table
+- [ ] Companies define a domain. Users can register if they verify an email in that domain
+- [ ] Users must be approved by an admin.
+- [ ] 
+
+*Company* 
+domain name (Users who verify email addresses in this domain will be added to the verifying usergroup)
+company
+public key
+private key
+
+*User*
+first name
+last name
+usergroup (ENUM: verifying, user, admin)
+email
+isEmailVerified
+password
+
+
 - [ ] Rewrite in typescript
 - [ ] Split server into modules
 - [ ] Rewrite front end in angular 2
