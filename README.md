@@ -27,18 +27,18 @@ A 'just add keys' JWT authentication endpoint.
 - [ ] 
 
 *Company* 
-domain name (Users who verify email addresses in this domain will be added to the verifying usergroup)
-company
-public key
-private key
+- domain name (Users who verify email addresses in this domain will be added to the verifying usergroup)
+- company
+- public key
+- private key
 
 *User*
-first name
-last name
-usergroup (ENUM: verifying, user, admin)
-email
-isEmailVerified
-password
+- first name
+- last name
+- usergroup (ENUM: verifying, user, admin)
+- email
+- isEmailVerified
+- password
 
 
 - [ ] Rewrite in typescript
